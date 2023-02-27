@@ -20,25 +20,28 @@ public class CamaraController : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (rotationActive)
+        if(target != null)
         {
-            Quaternion camRotation = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationSpeed, Vector3.up);
-            offset = camRotation * offset;
-        }
-        Vector3 newPos = target.transform.position + offset;
-        transform.position = Vector3.Slerp(transform.position, newPos, smoothness);
-        if(lookAtPlayer || rotationActive)
-        {
-            transform.LookAt(target.transform);
-        }
-        if (Input.GetButton("Fire1"))
-        {
-            rotationActive = true;
-        }
-        else
-        {
-            rotationActive = false;
-            transform.LookAt(target.transform);
-        }
+            if (rotationActive)
+            {
+                Quaternion camRotation = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationSpeed, Vector3.up);
+                offset = camRotation * offset;
+            }
+            Vector3 newPos = target.transform.position + offset;
+            transform.position = Vector3.Slerp(transform.position, newPos, smoothness);
+            if (lookAtPlayer || rotationActive)
+            {
+                transform.LookAt(target.transform);
+            }
+            if (Input.GetButton("Fire1"))
+            {
+                rotationActive = true;
+            }
+            else
+            {
+                rotationActive = false;
+                transform.LookAt(target.transform);
+            }
+        }        
     }
 }

@@ -67,7 +67,6 @@ public class Missile : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collision");
         if (explosionPrfb)
         {
             Instantiate(explosionPrfb, transform.position, Quaternion.identity);            
@@ -75,11 +74,9 @@ public class Missile : MonoBehaviour
 
         if(collision.gameObject.tag == "Player")
         {
-            Debug.Log("Objetivo");
-            Destroy(target);
+            Destroy(collision.gameObject);
         }
 
-        Debug.Log("Autodestruccion");
         Destroy(gameObject);
     }
 
