@@ -6,13 +6,17 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
     public float rotationSpeed = 3f;
+    public Rigidbody tRb;
 
-    void Awake()
+    private void Start()
     {
-        
+        if(tRb == null)
+        {
+            tRb = GetComponent<Rigidbody>();
+        }
     }
 
-    void Update()
+    private void Update()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
