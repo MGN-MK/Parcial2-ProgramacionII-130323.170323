@@ -613,7 +613,8 @@ MonoBehaviour:
   mRb: {fileID: 0}
   target: {fileID: 0}
   explosionPrfb: {fileID: 3816285418556643544, guid: 4705f5e261c84ad498533cf766476893, type: 3}
-  explosionClip: {fileID: 8300000, guid: ada090746ee14d04ea558323be92aaa9, type: 3}
+  audioSPrfb: {fileID: 7103219663374611807, guid: 018481e12bfa2ca4693ae9f4152b356a, type: 3}
+  explosionSound: {fileID: 8300000, guid: ada090746ee14d04ea558323be92aaa9, type: 3}
   mSpeed: 20
   mRotateSpeed: 90
   maxDistance: 100
@@ -5670,7 +5671,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2082686928}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

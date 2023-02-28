@@ -7,6 +7,8 @@ public class Missile : MonoBehaviour
     public Rigidbody mRb;
     public PlayerController target;
     public GameObject explosionPrfb;
+    public GameObject audioSPrfb;
+    public AudioClip explosionSound;
 
     [Header("Movement")]
     public float mSpeed;
@@ -67,10 +69,9 @@ public class Missile : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (explosionPrfb)
-        {
-            Instantiate(explosionPrfb, transform.position, Quaternion.identity);            
-        }
+        audioSPrfb.GetComponent<AudioSource>().clip = explosionSound;
+        Instantiate(explosionPrfb, transform.position, Quaternion.identity);
+        Instantiate(audioSPrfb, transform.position, Quaternion.identity);
 
         if(collision.gameObject.tag == "Player")
         {
