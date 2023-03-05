@@ -1,5 +1,13 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+
+public enum MissileStatus
+{
+    LAUNCH,
+    FIND_TARGET,
+    FOLLOWING_TARGET
+}
 
 public class Missile : MonoBehaviour
 {
@@ -9,6 +17,8 @@ public class Missile : MonoBehaviour
     public GameObject explosionPrfb;
     public GameObject audioSPrfb;
     public AudioClip explosionSound;
+    public float upTime;
+    private MissileStatus missileStatus;
 
     [Header("Movement")]
     public float mSpeed;
@@ -24,27 +34,54 @@ public class Missile : MonoBehaviour
     public float deviationAmount;
     public float deviationSpeed;
 
-    private void Awake()
+    private void Start()
     {
         if(mRb == null)
         {
             mRb = GetComponent<Rigidbody>();
-        }
+        }       
 
-        if(target == null)
-        {
-            target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        }
+        missileStatus = MissileStatus.LAUNCH;
+        StartCoroutine(MissileLife());
     }
 
-    private void FixedUpdate()
+    IEnumerator MissileLife()
     {
-        mRb.velocity = transform.forward * mSpeed;
-        var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, target.transform.position));
+        switch (missileStatus)
+        {
+            case MissileStatus.LAUNCH:
+                Debug.Log("Missile launched");
 
-        PredictionMovementTarget(leadTimePercentage);
-        AddDeviation(leadTimePercentage);
-        Rotation();
+                Vector3 lookUp = new Vector3(0f, 90f, 0f);
+                mRb.velocity = transform.up * mSpeed;
+                mRb.rotation = Quaternion.LookRotation(lookUp);
+                missileStatus = MissileStatus.FIND_TARGET;
+                break;
+
+            case MissileStatus.FIND_TARGET:
+                yield return new WaitForSeconds(upTime);
+
+                Debug.Log("Searching target");
+
+                if (target == null)
+                {
+                    target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+                }
+
+                missileStatus = MissileStatus.FOLLOWING_TARGET;                
+                break;
+
+            case MissileStatus.FOLLOWING_TARGET:
+                Debug.Log("Following target");
+
+                mRb.velocity = transform.forward * mSpeed;
+                var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, target.transform.position));
+
+                PredictionMovementTarget(leadTimePercentage);
+                AddDeviation(leadTimePercentage);
+                Rotation();
+                break;
+        }
     }
 
     private void PredictionMovementTarget(float leadTP)
@@ -69,6 +106,8 @@ public class Missile : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Touched target");
+
         audioSPrfb.GetComponent<AudioSource>().clip = explosionSound;
         Instantiate(explosionPrfb, transform.position, Quaternion.identity);
         Instantiate(audioSPrfb, transform.position, Quaternion.identity);
@@ -83,7 +122,10 @@ public class Missile : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, standardPredict);
+        if(target != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, target.gameObject.transform.position);
+        }        
     }
 }

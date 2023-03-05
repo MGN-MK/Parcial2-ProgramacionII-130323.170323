@@ -615,6 +615,7 @@ MonoBehaviour:
   explosionPrfb: {fileID: 3816285418556643544, guid: 4705f5e261c84ad498533cf766476893, type: 3}
   audioSPrfb: {fileID: 7103219663374611807, guid: 018481e12bfa2ca4693ae9f4152b356a, type: 3}
   explosionSound: {fileID: 8300000, guid: ada090746ee14d04ea558323be92aaa9, type: 3}
+  upTime: 3
   mSpeed: 20
   mRotateSpeed: 90
   maxDistance: 100
@@ -657,9 +658,9 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1.29
+  DopplerLevel: 2.06
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -694,7 +695,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
