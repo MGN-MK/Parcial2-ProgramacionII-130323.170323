@@ -2,13 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum MissileStatus
-{
-    LAUNCH,
-    FIND_TARGET,
-    FOLLOWING_TARGET
-}
-
 public class Missile : MonoBehaviour
 {
     [Header("References")]
@@ -18,7 +11,10 @@ public class Missile : MonoBehaviour
     public GameObject audioSPrfb;
     public AudioClip explosionSound;
     public float upTime;
-    private MissileStatus missileStatus;
+
+    private bool isLaunching = false;
+    private bool searchingTarget = false;
+    private bool isFollowing = false;
 
     [Header("Movement")]
     public float mSpeed;
@@ -40,48 +36,48 @@ public class Missile : MonoBehaviour
         {
             mRb = GetComponent<Rigidbody>();
         }       
-
-        missileStatus = MissileStatus.LAUNCH;
+        
         StartCoroutine(MissileLife());
+    }
+
+    private void FixedUpdate()
+    {
+        if (isLaunching)
+        { 
+            Vector3 lookUp = new Vector3(0f, 90f, 0f);
+            mRb.rotation = Quaternion.LookRotation(lookUp);
+            mRb.velocity = transform.forward * mSpeed;            
+        }
+        else if (searchingTarget)
+        {
+            if (target == null)
+            {
+                target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+            }
+        }
+        else if (isFollowing)
+        {
+            mRb.velocity = transform.forward * mSpeed;
+            var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, target.transform.position));
+
+            PredictionMovementTarget(leadTimePercentage);
+            AddDeviation(leadTimePercentage);
+            Rotation();
+        }
     }
 
     IEnumerator MissileLife()
     {
-        switch (missileStatus)
-        {
-            case MissileStatus.LAUNCH:
-                Debug.Log("Missile launched");
-
-                Vector3 lookUp = new Vector3(0f, 90f, 0f);
-                mRb.velocity = transform.up * mSpeed;
-                mRb.rotation = Quaternion.LookRotation(lookUp);
-                missileStatus = MissileStatus.FIND_TARGET;
-                break;
-
-            case MissileStatus.FIND_TARGET:
-                yield return new WaitForSeconds(upTime);
-
-                Debug.Log("Searching target");
-
-                if (target == null)
-                {
-                    target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-                }
-
-                missileStatus = MissileStatus.FOLLOWING_TARGET;                
-                break;
-
-            case MissileStatus.FOLLOWING_TARGET:
-                Debug.Log("Following target");
-
-                mRb.velocity = transform.forward * mSpeed;
-                var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, target.transform.position));
-
-                PredictionMovementTarget(leadTimePercentage);
-                AddDeviation(leadTimePercentage);
-                Rotation();
-                break;
-        }
+        Debug.Log("Missile launched");
+        isLaunching = true;
+        yield return new WaitForSeconds(upTime);
+        Debug.Log("Searching target");
+        isLaunching = false;
+        searchingTarget = true;
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log("Following target");
+        searchingTarget = false;
+        isFollowing = true;
     }
 
     private void PredictionMovementTarget(float leadTP)

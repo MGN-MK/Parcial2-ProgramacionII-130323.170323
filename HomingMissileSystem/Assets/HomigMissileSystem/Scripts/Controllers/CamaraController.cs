@@ -9,8 +9,9 @@ public class CamaraController : MonoBehaviour
     public float smoothness = 0.1f;
 
     private bool rotationActive;
-    private bool lookAtPlayer;
+    private Vector3 targetLastPosition;
     private Vector3 offset;
+    private Vector3 newPos;
     private GameObject target;
 
     private void Start()
@@ -24,13 +25,16 @@ public class CamaraController : MonoBehaviour
         {
             Quaternion camRotation = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationSpeed, Vector3.up);
             offset = camRotation * offset;
+            transform.LookAt(targetLastPosition);
         }
-        Vector3 newPos = target.transform.position + offset;
-        transform.position = Vector3.Slerp(transform.position, newPos, smoothness);
-        if (lookAtPlayer || rotationActive)
+
+        if(target != null)
         {
-            transform.LookAt(target.transform);
+            targetLastPosition = target.transform.position;
+            newPos = targetLastPosition + offset;            
         }
+
+        transform.position = Vector3.Slerp(transform.position, newPos, smoothness);
 
         if (Input.GetButton("Fire1"))
         {
@@ -39,7 +43,7 @@ public class CamaraController : MonoBehaviour
         else
         {
             rotationActive = false;
-            transform.LookAt(target.transform);
+            transform.LookAt(targetLastPosition);
         }      
     }
 }
