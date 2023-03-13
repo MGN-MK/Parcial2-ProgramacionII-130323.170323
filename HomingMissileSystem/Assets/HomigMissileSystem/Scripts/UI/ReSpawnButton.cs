@@ -14,7 +14,7 @@ public class ReSpawnButton : MonoBehaviour
         set => currentTarget = value;
     }
 
-    public GameObject currentTarget;
+    private GameObject currentTarget;
 
     //Funcion que se ejecuta al hacer click en el boton, genera un nuevo target en la misma posicion del ultimo target en escena
     public void ReSpawnObject()
