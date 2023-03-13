@@ -7,7 +7,7 @@ using TMPro;
 //Script encargado del movimiento del marcador de la posicion de un misil con respecto a la camara del objetivo, asi como el calculo e impresion en pantalla de la distancia entre dicho misil y el objetivo
 public class MissileWayPoint : MonoBehaviour
 {
-    //Variables publicas para que la posicion del icono con respecto al misil sea correcta (Ya que el canvas es muy grande en comparacion a lo qeu recorre el misil al principio), y el espacio de margen que mantendra el icono con los bordes del canvas
+    //Variables publicas para que la posicion del icono con respecto al misil sea correcta (Ya que el canvas es muy grande en comparacion a lo que recorre el misil al principio), y el espacio de margen que mantendra el icono con los bordes del canvas
     public float scale = 100;
     public float offset = 10;
 
