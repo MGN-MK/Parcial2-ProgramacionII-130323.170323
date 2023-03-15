@@ -32,8 +32,9 @@ El proyecto está listo para solo agregar los scripts y prefabs en los objetos d
 
 - Lanzador y Administrador de Misiles (MissileBase).
 - Misiles Auto-Dirigidos con Predicción del Movimiento del Objetivo.
+- Dos tipos de Misiles según e como persiguen al objetivo: Constantes y de un Punto.
 - Misiles lanzados cada cierto intervalo de tiempo (Se puede reducir con el paso del tiempo).
-- Estatus del Primer Misil Lanzado que sigue Activo (Velocidad, Aceleración, Ángulo, Posición, Fuerza, Dirección, Index del Misil).
+- Estatus del Primer Misil Lanzado que sigue Activo (Velocidad, Aceleración, Ángulo, Posición, Fuerza, Dirección, Index del Misil, Nombre del objetivo, Posición del Objetivo).
 - Icono que muestra en pantalla la posición del misil al que se le calculan su estatus.
 - Un jugador con un controlador básico para pruebas.
 - Cámara que sigue al jugador y que permite rotarla en de forma vertical y horizontal alrededor del jugador.
@@ -69,9 +70,13 @@ Si estás utilizando la escena que viene por defecto o los prefabs de prueba pue
 ### Misiles
 
 1. Con el prefab de prueba.
-    1. Agrega el prefab “Missile” (Prefabs > Missile).
+    1. Agrega el prefab “Missile_Constant” (Prefabs > Missile_Constant).
+    2. Agrega el prefab “Missile_OnePosition” (Prefabs > Missile_OnePosition).
 2. Configurando uno propio.
-    1. Al objeto que será tu misil agregale el script “MissileSpawn” (Scripts > Missile > MissileSpawn), y rellena los campos con sus respectivos componentes. 
+    1. Al objeto que será tu misil agregale el script “Missile” (Scripts > Missile > Missile), y rellena los campos con sus respectivos componentes. 
+    - Following Type. Selecciona el tipo de misil según a cómo quieres que siga al objetivo.
+        - CONSTANT. Sigue al objetivo de forma constante, dirigiéndose siempre hacia su posición.
+        - ONEPOSITION. Se dirige a la posición del jugador que registró al activarse su función de seguimiento.
     - References (Referencias)
         - Explosion Prfb. Asigna el prefab de la explosiñon que se va a crear en la misma posición que el misil.
         - Audio S Prfb. Asigna el prefab del audioSource que se reproducirá cuando el misil se destruya.
@@ -105,7 +110,7 @@ Si estás utilizando la escena que viene por defecto o los prefabs de prueba pue
     1. Al objeto que será tu lanzador de misiles crea como hijos objetos vacíos que serán los *SpawnPoints* (puntos de aparición).
     2. Coloca los puntos de aparición en la posición que desees, y ponles un tag para ellos únicamente.
     3. Al objeto padre agregale el script “MissileSpawn” (Scripts > Missile > MissileSpawn), y rellena los campos con sus respectivos componentes.
-    - Missile Prfb. Asigna el prefab del misil que se va a crear en la misma posición del punto de aparición elegido al azar.
+    - Missile Prfbs. Asigna los prefabs de los misiles que se va a crear en la misma posición del punto de aparición elegido al azar. el misil que se lanzará se escogerá también de forma aleatoria.
     - Missiles Launched Reduce Time. Escribe el número de misiles que se tienen que lanzar antes de reducir el intervalo del lanzamiento entre cada uno.
     - Missiles Spawning Time. Escribe los segundos de intervalo entre el lanzamiento de cada misil.
     - Target Destroyed Life Time. Escribe el número de segundos que tienen que pasar después de que el objetivo sea eliminado para que los misiles se destruyan.
@@ -135,6 +140,8 @@ Necesitas tener un canvas en Escena, utiliza el que tengas o crea uno nuevo.
         - Direction Text. Toma el objeto TextMeshPro que corresponda a la dirección y arrástralo para agregarlo. Se muestra en x, y, z.
         - Missiles Text. Toma el objeto TextMeshPro que corresponda al número de misiles y arrástralo para agregarlo. Se muestra en números.
         - Index Text. Toma el objeto TextMeshPro que corresponda al número del misil del que se esta tomando registro y arrástralo para agregarlo. Se muestra en números.
+        - Index Target.  Toma el objeto TextMeshPro que corresponda al nombre del objetivo y arrástralo para agregarlo. Se muestra como texto.
+        - Position Target.  Toma el objeto TextMeshPro que corresponda a la posición del objetivo y arrástralo para agregarlo. Se muestra en x, y, z.
 
 [Índice](https://www.notion.so/ndice-8993490a2e864250b0c16bf0c8b89fe2) 
 
@@ -223,6 +230,11 @@ Dentro del script “UIText” (Scripts > UI > UIText), puedes acceder a las var
     private Vector3 position;
     private float power;
     private Vector3 direction;
+    private bool active = true;
+    private MissileSpawn missileSpawn;
+    private int missilesActive;
+    private string targetName;
+    private Vector3 targetPos;
 ```
 
 En caso de que quieras utilizar su contenido puedes reemplazar private por public, o generar una nueva variable antes de la funcion Start() para acceder a ellas desde otro script, como:
@@ -233,6 +245,28 @@ public bool setActive //Cuida que el tipo de dato coincida con el de la variable
         get => isActive; //Esto es para solo leer los datos
         set => isActive = value; //Esto es para sobreescribir los datos
     }
+```
+
+También tal vez requieras cambiar el nombre del componente que se busca para acceder al nombre del objetivo, en el siguiente bloque de código precisamente:
+
+```csharp
+if (missile.gameObject.GetComponent<Missile>().target != null)
+        {
+            //Obtiene el nombre del target
+            targetName = missile.gameObject.GetComponent<Missile>().target.GetComponent<PlayerController>().nameID;
+            indexTarget.text = "Objetivo Actual: " + targetName;
+
+            //Obtiene la posicion del target
+            targetPos = missile.gameObject.GetComponent<Missile>().positionOfTarget;
+            positionTarget.text = "Posición del Objetivo: " + targetPos;
+        }
+```
+
+Para ello, reemplaza la variable “PlayerController” por el nombre del script que controla tu cámara. También reemplaza la palabra “nameID” que viene justo después de lo anterior por el nombre de la variable que representa el nombre del objetivo.
+
+```csharp
+//Obtiene el nombre del target
+            targetName = missile.gameObject.GetComponent<Missile>().target.GetComponent<PlayerController>().nameID;
 ```
 
 [Índice](https://www.notion.so/ndice-8993490a2e864250b0c16bf0c8b89fe2) 
