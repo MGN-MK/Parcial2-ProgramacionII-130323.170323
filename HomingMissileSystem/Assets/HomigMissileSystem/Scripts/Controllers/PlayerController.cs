@@ -5,7 +5,8 @@ using UnityEngine;
 //Controlador basico del jugador, no utiliza fisicas
 public class PlayerController : MonoBehaviour
 {
-    //VAriable spublicas que rigen el movimiento del jugador
+    //Variables publicas que rigen el movimiento del jugador
+    public string nameID;
     public float speed = 5f;
     public float rotationSpeed = 3f;
     public Rigidbody tRb;

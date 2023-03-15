@@ -2,9 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum FollowingType
+{
+    CONSTANT, ONEPOSITION
+}
+
 //Controlador de los movimientos del misil, prediccion y destruccion
 public class Missile : MonoBehaviour
 {
+    //Establece cómo el misil va a seguir al objetivo
+    public FollowingType followingType;
+
     //Referencias a objetos publicos
     [Header("References")]
     public GameObject explosionPrfb;
@@ -17,6 +25,11 @@ public class Missile : MonoBehaviour
     {
         get => playerGameObject;
         set => playerGameObject = value;
+    }
+
+    public Vector3 positionOfTarget
+    {
+        get => targetPosition;
     }
 
     public int missileIndex
@@ -42,6 +55,9 @@ public class Missile : MonoBehaviour
     public float lifeTime;
     public float mSpeed;
     public float mRotateSpeed;
+
+    private Vector3 targetPosition;
+    private bool settedTargetPosition = false;
 
     //Variables para la aceleracion constante del misil asi como el retraso que tiene para evitar que suba exponencialmente
     [Range(0f, 1f)]
@@ -98,18 +114,37 @@ public class Missile : MonoBehaviour
             mSpeed += mSpeed * accelerationPercentage / accelerationDelay / 2;
             mRotateSpeed += mRotateSpeed * accelerationPercentage / accelerationDelay;
 
-            if(recalculate)
-            {                
-                
-                mRb.MoveRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(lookUp), mRotateSpeed * Time.deltaTime));
-            }
-            else
+            if(followingType == FollowingType.CONSTANT)
             {
-                var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, playerGameObject.transform.position));
+                targetPosition = playerGameObject.transform.position;
 
-                PredictionMovementTarget(leadTimePercentage);
-                AddDeviation(leadTimePercentage);
-                Rotation();
+                if (recalculate)
+                {
+                    mRb.MoveRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(lookUp), mRotateSpeed * Time.deltaTime));
+                }
+                else
+                {
+                    var leadTimePercentage = Mathf.InverseLerp(minDistance, maxDistance, Vector3.Distance(transform.position, playerGameObject.transform.position));
+
+                    PredictionMovementTarget(leadTimePercentage);
+                    AddDeviation(leadTimePercentage);
+                    Rotation();
+                }
+            }
+            else if(followingType == FollowingType.ONEPOSITION)
+            {
+                if (settedTargetPosition)
+                {
+                    heading = targetPosition - transform.position;
+                    var rotation = Quaternion.LookRotation(heading);
+                    mRb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, mRotateSpeed * Time.deltaTime));
+                }
+                else
+                {
+                    Debug.Log("Set target position");
+                    targetPosition = playerGameObject.transform.position;
+                    settedTargetPosition = true;
+                }
             }
             
         }
@@ -121,7 +156,7 @@ public class Missile : MonoBehaviour
         }
 
         //Si se queda sin objetivo, empieza la secuencia para destruirse en tal caso
-        if(target == null)
+        if(playerGameObject == null)
         {
             StartCoroutine(TargetDeadTime());
         }

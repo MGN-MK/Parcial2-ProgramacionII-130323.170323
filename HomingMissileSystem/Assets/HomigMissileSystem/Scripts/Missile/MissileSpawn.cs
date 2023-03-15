@@ -6,7 +6,9 @@ using UnityEngine;
 public class MissileSpawn : MonoBehaviour
 {
     //Variables publicas para los prefabs y administracion de tiempos
-    public GameObject missilePrfb;
+    public GameObject[] missilesPrfbs;
+    private GameObject launchedMissile;
+
     public int missilesLaunchedReduceTime;
     public float missilesSpawningTime;
     public float targetDestroyedLifeTime;
@@ -111,8 +113,9 @@ public class MissileSpawn : MonoBehaviour
     //Funcion que lanza un nuevo misil eligiendo de forma aleatoria el punto de spawn. Se le asigna al nuevo misil el objetivo y se agrega a la lista de misiles activos
     private void NewMissileLaunched()
     {
+        launchedMissile = missilesPrfbs[Random.Range(0, missilesPrfbs.Length)];
         spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform;
-        newMissile = Instantiate(missilePrfb, spawnPoint.position, Quaternion.identity);
+        newMissile = Instantiate(launchedMissile, spawnPoint.position, Quaternion.identity);
         newMissile.GetComponent<Missile>().target = target;
 
         missilesBuffer.Add(newMissile);

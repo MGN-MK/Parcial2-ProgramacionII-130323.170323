@@ -15,6 +15,8 @@ public class UIText : MonoBehaviour
     public TextMeshProUGUI directionText;
     public TextMeshProUGUI missilesText;
     public TextMeshProUGUI indexText;
+    public TextMeshProUGUI indexTarget;
+    public TextMeshProUGUI positionTarget;
 
     //Variables para los calculos de cada tipo de dato, accesar al spawner de los misiles y a ellos mismos.
     private Rigidbody missile;
@@ -30,6 +32,8 @@ public class UIText : MonoBehaviour
     private bool active = true;
     private MissileSpawn missileSpawn;
     private int missilesActive;
+    private string targetName;
+    private Vector3 targetPos;
 
     //Listado de todos los misiles activos
     private Missile[] missilesNearby;
@@ -55,6 +59,8 @@ public class UIText : MonoBehaviour
             powerText.gameObject.SetActive(active);
             directionText.gameObject.SetActive(active);
             indexText.gameObject.SetActive(active);
+            indexTarget.gameObject.SetActive(active);
+            positionTarget.gameObject.SetActive(active);
         }
 
         //Si estan los textos activados y el objeto misil no esta vacio. se calcula el estatus de dicho misil
@@ -101,6 +107,17 @@ public class UIText : MonoBehaviour
         //Se obtiene la direccion del script del misil, que la calcula previamente
         direction = missile.gameObject.GetComponent<Missile>().looking;
         directionText.text = "Dirección: " + direction.ToString("F2");
+
+        if (missile.gameObject.GetComponent<Missile>().target != null)
+        {
+            //Obtiene el nombre del target
+            targetName = missile.gameObject.GetComponent<Missile>().target.GetComponent<PlayerController>().nameID;
+            indexTarget.text = "Objetivo Actual: " + targetName;
+
+            //Obtiene la posicion del target
+            targetPos = missile.gameObject.GetComponent<Missile>().positionOfTarget;
+            positionTarget.text = "Posición del Objetivo: " + targetPos;
+        }
     }
 
     //Calcula la aceleracion guardando dos velocidades con una diferencia de 1 segundo, para ejecutar la formula Aceleracion = velocidad final - velocidad inicial / tiempo (este ultimo se omite al ser de 1 segundo)
@@ -127,7 +144,7 @@ public class UIText : MonoBehaviour
             if (thisMissile != null && missile == null)
             {
                 missile = thisMissile.GetComponent<Rigidbody>();
-                indexText.text = "Misil Actual: " + thisMissile.missileIndex;
+                indexText.text = "Misil Actual: " + thisMissile.missileIndex + " tipo " + thisMissile.followingType;
             }
         }
     }

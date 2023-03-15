@@ -79,7 +79,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd1f89c9d1e12649b6b1741b13b071c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  missilePrfb: {fileID: 1386208809531653533, guid: e9c18fb50c20deb4992c3bf13c5950c2, type: 3}
+  missilesPrfbs:
+  - {fileID: 1386208809531653533, guid: e9c18fb50c20deb4992c3bf13c5950c2, type: 3}
+  - {fileID: 8096405843947132638, guid: 4cd724b7177d9de488ad7ead343b1942, type: 3}
   missilesLaunchedReduceTime: 4
   missilesSpawningTime: 5
   targetDestroyedLifeTime: 3
